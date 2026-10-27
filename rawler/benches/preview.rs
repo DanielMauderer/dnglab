@@ -52,7 +52,18 @@ fn samples() -> Vec<(&'static str, PathBuf)> {
       "EOS 5D Mark II",
       "raw_modes/Canon EOS 5D Mark II_ISO_100_RAW.CR2",
     ),
-    ("canon_eos_r5_cr3", "Canon", "EOS R5", "raw_modes/Canon EOS R5_CRAW_ISO_100_nocrop_nodual.CR3"),
+    (
+      "canon_eos_m50_cr3_raw",
+      "Canon",
+      "EOS M50",
+      "raw_modes/Canon EOS M50_RAW_ISO_100_nocrop_nodual.CR3",
+    ),
+    (
+      "canon_eos_m50_cr3_craw",
+      "Canon",
+      "EOS M50",
+      "raw_modes/Canon EOS M50_CRAW_ISO_100_nocrop_nodual.CR3",
+    ),
     ("nikon_d3s_nef", "Nikon", "D3S", "raw_modes/NIKON D3S_ISO_200_12bits_Lossless.NEF"),
   ]
   .into_iter()
