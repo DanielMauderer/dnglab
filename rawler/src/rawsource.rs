@@ -40,6 +40,21 @@ impl RawSource {
     })
   }
 
+  /// Open a file without reading it into memory upfront.
+  ///
+  /// Pages are only loaded from disk when they are accessed. This is
+  /// much faster if only a small part of the file is needed, like
+  /// metadata, thumbnail or preview image. For decoding the full
+  /// raw image, [`RawSource::new`] is preferred.
+  pub fn new_lazy(path: &Path) -> std::io::Result<Self> {
+    let file = File::open(path)?;
+    let mmap = unsafe { MmapOptions::new().map(&file)? };
+    Ok(Self {
+      path: path.canonicalize().unwrap_or_else(|_| path.to_owned()),
+      inner: RawSourceImpl::Memmap(mmap),
+    })
+  }
+
   pub fn new_from_shared_vec(buf: Arc<Vec<u8>>) -> Self {
     Self {
       path: PathBuf::default(),
@@ -144,5 +159,20 @@ impl Deref for RawSource {
 impl Debug for RawSource {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     f.debug_struct("RawSource").field("path", &self.path).finish()
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn lazy_source_matches_eager() -> std::io::Result<()> {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("Cargo.toml");
+    let eager = RawSource::new(&path)?;
+    let lazy = RawSource::new_lazy(&path)?;
+    assert_eq!(eager.buf(), lazy.buf());
+    assert_eq!(eager.path(), lazy.path());
+    Ok(())
   }
 }
